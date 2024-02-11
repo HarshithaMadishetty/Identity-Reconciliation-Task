@@ -19,7 +19,7 @@ const Contact =  mongoose.model("Contact", contactSchema);
 
 async function connectDB() {
   try {
-    await mongoose.connect("mongodb://0.0.0.0/FluxKart", {
+    await mongoose.connect("mongodb://localhost:27017/FluxKart", {
        
     });
     console.log("Database Connected !!");
