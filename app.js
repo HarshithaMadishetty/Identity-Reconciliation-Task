@@ -14,7 +14,7 @@ app.post('/identify', async (req, res) => {
     try {
         // Extract email and phoneNumber from the request body
         const { email, phoneNumber } = req.body;
-
+        
         // Find existing contacts with the provided email and phoneNumber
         const existingEmailContact = await Contact.findOne({ email });
         const existingPhoneContact = await Contact.findOne({ phoneNumber });
@@ -63,34 +63,34 @@ app.post('/identify', async (req, res) => {
         // Find existing contacts with the provided email and phoneNumber
         const existingContact = await Contact.findOne({ $or: [{ email }, { phoneNumber }] });
         if (existingContact) {
-            console.log("Inside Find existing contacts with the provided email and phoneNumber");
+            
             // Fetch primary contact if the given contact is secondary
             const primaryContact = existingContact.linkPrecedence === 'secondary' ? await Contact.findById(existingContact.linkedId) : existingContact;
-
+            
             // Fetch secondary contacts linked to the primary contact
             const secondaryContacts = await Contact.find({ linkedId: primaryContact._id });
-
-            // Construct the consolidated contact information
             console.log(secondaryContacts);
+            // Construct the consolidated contact information
+            
             const consolidatedContact = {
                 primaryContactId: primaryContact._id,
                 emails: [primaryContact.email, ...secondaryContacts.map(contact => contact.email)],
                 phoneNumbers: [primaryContact.phoneNumber, ...secondaryContacts.map(contact => contact.phoneNumber)],
                 secondaryContactIds: secondaryContacts.map(contact => contact._id)
             };
-
+            
             // Return the consolidated contact information as JSON data
             return res.status(200).json({ contact: consolidatedContact });
         }
 
         // Create a new secondary contact and link it to the primary contact
-        const primaryContact = await Contact.findOne({ $or: [{ email }, { phoneNumber }] }); // Check if there's an existing contact with the same email
+        const primaryContact = await Contact.findOne({ $or: [{ email }, { phoneNumber }] }); // Check if there's an existing contact with the same email or phone number
         if (primaryContact) {
             // Email matches, create a new secondary contact
             
             const newSecondaryContact = new Contact({
                
-                email: existingEmailContact ? null : email,
+                    email: existingEmailContact ? null : email,
                     phoneNumber: existingPhoneContact ? null : phoneNumber,
                     linkedId: primaryContact._id,
                     linkPrecedence: "secondary"
@@ -101,7 +101,7 @@ app.post('/identify', async (req, res) => {
             return res.status(200).json({ contact: newSecondaryContact });
         }
         
-
+        
         // If no matching contact found, create a new primary contact
         
         const newPrimaryContact = new Contact({
@@ -114,6 +114,7 @@ app.post('/identify', async (req, res) => {
 
         // Return the response with the newly created primary contact
         return res.status(200).json({ contact: newPrimaryContact });
+        
 
     } catch (error) {
         console.error('Error processing request:', error);
