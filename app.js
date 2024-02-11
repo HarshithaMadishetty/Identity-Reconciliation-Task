@@ -122,7 +122,7 @@ app.post('/identify', async (req, res) => {
 });
 
 // Endpoint to identify users
-app.get('/identify', (req, res) => {
+app.get('/', (req, res) => {
     res.send('Welcome to your application');
 });
 
